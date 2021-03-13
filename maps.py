@@ -4,7 +4,7 @@ import pprint
 import time
 
 # Define the API Key.
-API_KEY = 'AIzaSyBSH21aLNUkkW2I0eOu1tR8YA0JkdJkzWk'
+API_KEY = 'your api key'
 
 # Define the Client
 gmaps = googlemaps.Client(key = API_KEY)
