@@ -107,20 +107,20 @@ def scrape_accommodation_data(driver, accommodation_url):
         driver = prepare_driver(accommodation_url)
 
     driver.get(accommodation_url)
-    time.sleep(1)
+    time.sleep(5)
 
     accommodation_fields = dict()
 
     # Get the accommodation score
-    try:
-        name_container = driver.find_element_by_class_name(
-            'bui-review-score--end')
-        name_child = name_container.find_element_by_class_name(
-            'bui-review-score__badge')
-        name_text = name_child.text
-        accommodation_fields['score'] = name_text
-    except NoSuchElementException:
-        accommodation_fields['score'] = 'empty'
+    # try:
+    #     name_container = driver.find_element_by_class_name(
+    #         'bui-review-score--end')
+    #     name_child = name_container.find_element_by_class_name(
+    #         'bui-review-score__badge')
+    #     name_text = name_child.text
+    #     accommodation_fields['score'] = name_text
+    # except NoSuchElementException:
+    #     accommodation_fields['score'] = 'empty'
 
     # Get the accommodation name
     try:
@@ -130,35 +130,35 @@ def scrape_accommodation_data(driver, accommodation_url):
         accommodation_fields['name'] = 'empty'
 
     # Get the accommodation location
-    try:
-        accommodation_fields['location'] = driver.find_element_by_id('showMap2')\
-            .find_element_by_class_name('hp_address_subtitle').text
-    except NoSuchElementException:
-        accommodation_fields['location'] = 'empty'
+    # try:
+    #     accommodation_fields['location'] = driver.find_element_by_id('showMap2')\
+    #         .find_element_by_class_name('hp_address_subtitle').text
+    # except NoSuchElementException:
+    #     accommodation_fields['location'] = 'empty'
 
     # Get the most popular facilities
 
-    try:
-        accommodation_fields['popular_facilities'] = list()
-        facilities = driver.find_element_by_class_name(
-            'hp_desc_important_facilities')
+    # try:
+    #     accommodation_fields['popular_facilities'] = list()
+    #     facilities = driver.find_element_by_class_name(
+    #         'hp_desc_important_facilities')
 
-        for facility in facilities.find_elements_by_class_name('important_facility'):
-            accommodation_fields['popular_facilities'].append(facility.text)
-    except NoSuchElementException:
-        accommodation_fields['popular_facilities'] = []
+    #     for facility in facilities.find_elements_by_class_name('important_facility'):
+    #         accommodation_fields['popular_facilities'].append(facility.text)
+    # except NoSuchElementException:
+    #     accommodation_fields['popular_facilities'] = []
 
     return accommodation_fields
 
 
 if __name__ == '__main__':
-    city = "barranquilla, colombia"
+    city = "Monteria, colombia"
     try:
         driver = prepare_driver(url)
         fill_form(driver, city)
         accommodations_data = scrape_results(driver)
         accommodations_data = json.dumps(accommodations_data, indent=4)
-        with open('barranquilla_booking.json', 'w') as f:
+        with open('monteria_booking.json', 'w', encoding='utf8') as f:
             f.write(accommodations_data)
     finally:
         driver.quit()
