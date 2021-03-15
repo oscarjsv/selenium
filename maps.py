@@ -1,25 +1,26 @@
 import googlemaps
-import json
-import pprint
 import time
 
-# Define the API Key.
-API_KEY = 'your api key'
+gmaps = googlemaps.Client(key='AIzaSyBSH21aLNUkkW2I0eOu1tR8YA0JkdJkzWk')
 
-# Define the Client
-gmaps = googlemaps.Client(key = API_KEY)
+def print_Hotels(searchString, next=''):
+    count = 0
+    try:
+        places_result = gmaps.places(searchString, page_token=next)
+    except ex as e:
+        print(e)
+    else:
+        for result in places_result['results']:
+            count += 1
+            print(result['name'], count)
+    time.sleep(2)
+    try:
+        places_result['next_page_token']
+    except KeyError as e:
+        print('Complete')
+    else:
+        print_Hotels(searchString, next=places_result['next_page_token'])
 
 
-places_result  = gmaps.places_nearby(location='8.7600805,-75.8812715', radius = 40000, open_now =False , type = 'hotels')
-
-time.sleep(3)
-
-places_result  = gmaps.places_nearby(page_token = places_result['next_page_token'])
-
-store_result = []
-
-for place in places_result['results']:
-    my_place_id = place['place_id']
-    my_fields = ['name']
-    places_details  = gmaps.place(place_id= my_place_id , fields= my_fields)
-    print(places_details)
+if __name__ == '__main__':
+    print_Hotels('hoteles monteria Cordoba')
