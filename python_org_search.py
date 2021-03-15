@@ -93,7 +93,7 @@ def scrape_results(driver):
             next_button = driver.find_element_by_class_name(
                 'paging-next').get_attribute("href")
         except Exception as e:
-            next_button = 'sirve perro'
+            next_button = ''
             pass
 
         print(next_button, 'next botton pagina')

@@ -1,7 +1,7 @@
 import googlemaps
 import time
 
-gmaps = googlemaps.Client(key='AIzaSyBSH21aLNUkkW2I0eOu1tR8YA0JkdJkzWk')
+gmaps = googlemaps.Client(key='')
 
 def print_Hotels(searchString, next=''):
     count = 0
