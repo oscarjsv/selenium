@@ -1,6 +1,6 @@
 import json
 import time
-from typing import cast
+from typing import Text, cast
 import selenium
 from selenium.webdriver.firefox.options import Options
 from selenium import webdriver
@@ -21,8 +21,9 @@ def prepare_driver(url):
     driver.implicitly_wait(10)
     return driver
 
+
 def fill_form(driver, city):
-    
+
     driver.find_element_by_class_name('lNCO-inner')
     search_field = driver.find_element_by_class_name('lNCO-inner')
     search_field.click()
@@ -47,7 +48,33 @@ def fill_form(driver, city):
     driver.find_element_by_class_name('c1AQ-submit')
     button = driver.find_element_by_class_name('c1AQ-submit')
     button.click()
+    time.sleep(14)
+
+    driver.find_element_by_class_name('showAll')
+    show_all = driver.find_element_by_class_name('showAll')
+    show_all.click()
     driver.implicitly_wait(15)
+
+
+
+    active = False
+    next_click = driver.find_element_by_class_name(
+            'ButtonPaginator').get_attribute("class")
+    if 'Common-Results-Paginator ButtonPaginator' == next_click:
+        active = True
+    while True:
+        next_click = driver.find_element_by_class_name(
+            'ButtonPaginator').get_attribute("class")
+
+        more_button = driver.find_element_by_class_name(
+            'moreButton')
+        if active:
+            break
+
+        more_button.click()
+
+        if 'Common-Results-Paginator ButtonPaginator' == next_click:
+            break
 
 
 
@@ -60,6 +87,7 @@ def scrape_results(driver):
     original_window = driver.current_window_handle
     assert len(driver.window_handles) == 1
     count = 0
+
     element = driver.find_element_by_class_name('allowWrap')
     for element in driver.find_elements_by_class_name('allowWrap'):
         element.click()
@@ -73,14 +101,14 @@ def scrape_results(driver):
                 driver.switch_to.window(handles[x])
                 urls = driver.current_url
                 accommodations_urls.append(urls)
-                print(accommodations_urls, count)
                 driver.close()
                 driver.switch_to.window(driver.window_handles[0])
-    
+
     for url in accommodations_urls:
         url_data = scrape_accommodation_data(driver, url)
-        print(url_data)
+        print(url_data, )
         accommodations_data.append(url_data)
+
 
 def scrape_accommodation_data(driver, accommodation_url):
     '''Visits an accommodation page and extracts the data.'''
@@ -89,17 +117,16 @@ def scrape_accommodation_data(driver, accommodation_url):
         driver = prepare_driver(accommodation_url)
 
     driver.get(accommodation_url)
-    time.sleep(3)
+    time.sleep(1)
 
     accommodation_fields = dict()
-    # Get the most popular facilities
 
     try:
-        accommodation_fields['name'] = driver.find_element_by_xpath(
-            '//*[@id="M57K"]/div/h1').text
+        accommodation_fields['name'] = driver.find_element_by_class_name(
+            'name').text
     except Exception as e:
         accommodation_fields['name'] = 'empty'
-    
+
     # try:
     #     accommodation_fields['rooms'] = driver.find_element_by_xpath(
     #         '//*[@id="at-a-glance"]/div/div/div[1]/div/ul[1]/li[1]').text
@@ -107,6 +134,7 @@ def scrape_accommodation_data(driver, accommodation_url):
     #     accommodation_fields['rooms'] = 'empty'
 
     return accommodation_fields
+
 
 if __name__ == '__main__':
     city = "Monteria, colombia"
@@ -116,3 +144,8 @@ if __name__ == '__main__':
         accommodations_data = scrape_results(driver)
     finally:
         driver.quit()
+
+# next_click = driver.find_element_by_class_name(
+#         'Common-Results-Paginator ButtonPaginator visible').get_attribute("href")
+
+# Common-Results-Paginator ButtonPaginator
