@@ -1,4 +1,6 @@
+from copy import error
 import json
+from logging import exception
 import time
 from typing import Text, cast
 import selenium
@@ -48,34 +50,32 @@ def fill_form(driver, city):
     driver.find_element_by_class_name('c1AQ-submit')
     button = driver.find_element_by_class_name('c1AQ-submit')
     button.click()
-    time.sleep(14)
+    time.sleep(20)
 
     driver.find_element_by_class_name('showAll')
     show_all = driver.find_element_by_class_name('showAll')
     show_all.click()
     driver.implicitly_wait(15)
 
-
-
-    active = False
     next_click = driver.find_element_by_class_name(
             'ButtonPaginator').get_attribute("class")
-    if 'Common-Results-Paginator ButtonPaginator' == next_click:
-        active = True
     while True:
         next_click = driver.find_element_by_class_name(
             'ButtonPaginator').get_attribute("class")
 
         more_button = driver.find_element_by_class_name(
             'moreButton')
-        if active:
-            break
-
-        more_button.click()
 
         if 'Common-Results-Paginator ButtonPaginator' == next_click:
             break
 
+        try:
+            more_button.click()
+        except Exception:
+            driver.find_element_by_tag_name('body').send_keys(Keys.CONTROL + Keys.HOME)
+            
+
+        driver.find_element_by_tag_name('body').send_keys(Keys.CONTROL + Keys.HOME)
 
 
 def scrape_results(driver):
@@ -106,9 +106,10 @@ def scrape_results(driver):
 
     for url in accommodations_urls:
         url_data = scrape_accommodation_data(driver, url)
-        print(url_data, )
+        print(url_data)
         accommodations_data.append(url_data)
 
+    return accommodations_data
 
 def scrape_accommodation_data(driver, accommodation_url):
     '''Visits an accommodation page and extracts the data.'''
@@ -117,16 +118,36 @@ def scrape_accommodation_data(driver, accommodation_url):
         driver = prepare_driver(accommodation_url)
 
     driver.get(accommodation_url)
-    time.sleep(1)
+    time.sleep(2)
 
     accommodation_fields = dict()
 
     try:
         accommodation_fields['name'] = driver.find_element_by_class_name(
-            'name').text
+            'name').text   
     except Exception as e:
-        accommodation_fields['name'] = 'empty'
+        try :
+            accommodation_fields['name'] = driver.find_element_by_class_name(
+                'c3xth-hotelName').text
+        except Exception as e:
+            accommodation_fields['name'] = 'empty'
 
+    try:
+        accommodation_fields['price'] = driver.find_element_by_class_name(
+            'bigPrice').text   
+        print("hello", driver.find_element_by_class_name(
+            'bigPrice').text)
+    except Exception as e:
+        try :
+            accommodation_fields['price'] = driver.find_element_by_class_name(
+                'c3xth-price').text
+            print(driver.find_element_by_class_name(
+                'c3xth-price').text, 'hello2')
+        except Exception as e:
+            accommodation_fields['price'] = 'empty'
+    
+
+    # c3xth-hotelName
     # try:
     #     accommodation_fields['rooms'] = driver.find_element_by_xpath(
     #         '//*[@id="at-a-glance"]/div/div/div[1]/div/ul[1]/li[1]').text
@@ -142,10 +163,9 @@ if __name__ == '__main__':
         driver = prepare_driver(url)
         fill_form(driver, city)
         accommodations_data = scrape_results(driver)
+        print(accommodations_data, 'esta monda')
+        accommodations_data = json.dumps(accommodations_data, indent=4)
+        with open('kayak_scraping.json', 'w', encoding='utf8') as f:
+            f.write(accommodations_data)
     finally:
         driver.quit()
-
-# next_click = driver.find_element_by_class_name(
-#         'Common-Results-Paginator ButtonPaginator visible').get_attribute("href")
-
-# Common-Results-Paginator ButtonPaginator
