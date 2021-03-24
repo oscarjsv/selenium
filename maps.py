@@ -4,6 +4,7 @@ import time
 gmaps = googlemaps.Client(key='')
 
 def print_Hotels(searchString, next=''):
+    '''Simple google maps scraper (still experimental)'''
     count = 0
     try:
         places_result = gmaps.places(searchString, page_token=next)

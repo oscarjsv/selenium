@@ -13,6 +13,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 url = 'https://www.kayak.com.co/hotels'
 city = "Monteria, Cordoba"
 
+'''Set all params and libraries for scraping process'''
 
 driver = webdriver.Chrome()
 driver.implicitly_wait(10)
@@ -34,7 +35,8 @@ driver.find_element_by_class_name('JyN0-name')
 imput = driver.find_element_by_class_name('JyN0-name')
 imput.click()
 driver.implicitly_wait(10)
-# We look for the search button and click it
+
+'''Look for search button and click it'''
 
 driver.find_element_by_class_name('c1AQ-header')
 button1 = driver.find_element_by_class_name('c1AQ-header')
@@ -49,6 +51,8 @@ driver.implicitly_wait(15)
 
 
 assert len(driver.window_handles) == 1
+
+'''Sets all elements and starts scraping loop'''
 
 element = driver.find_element_by_class_name('allowWrap')
 for element in driver.find_elements_by_class_name('allowWrap'):
